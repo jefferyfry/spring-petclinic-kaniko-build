@@ -18,7 +18,7 @@ spec:
     volumeMounts:
      - name: kaniko-secret
        mountPath: /secret
-   env:
+    env:
      - name: GOOGLE_APPLICATION_CREDENTIALS
        value: /secret/kaniko-secret.json
  restartPolicy: Never
