@@ -18,7 +18,7 @@ pipeline {
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
           sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure-skip-tls-verify --destination gcr.io/cloudbees-public/spring-petclinic:latest
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination gcr.io/cloudbees-public/kaniko/spring-petclinic:latest
           '''
         } 
       }
