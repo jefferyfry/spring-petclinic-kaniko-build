@@ -1,7 +1,10 @@
 
 pipeline {
   agent {
-    label 'maven-docker'
+    kubernetes {
+        label 'kaniko-build-pod'
+        yamlFile 'podTemplate/spring-petclinic-kaniko-build.yaml'
+    }
   }
   stages {
     stage('Maven Install') {
@@ -11,21 +14,18 @@ pipeline {
         }
       }
     }
-    stage('Docker Build') {
+    stage('Kaniko Build and Push') {
       steps {
-        container('docker'){
-          sh 'docker build -t jefferyfry/spring-petclinic:latest .'
-        }
+        container(name:'kaniko', shell:'/busybox/sh') {
+          sh '''#!/busybox/sh 
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure-skip-tls-verify --destination gcr.io/partner-demo-dev/spring-petclinic:latest
+          '''
+        } 
       }
     }
-    stage('Docker Push') {
+    stage('Deploy to Staging') {
       steps {
-        container('docker'){
-          withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-            sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-            sh 'docker push jefferyfry/spring-petclinic:latest'
-          }
-        }
+        echo 'deploy'
       }
     }
   }
